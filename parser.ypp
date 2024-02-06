@@ -1,7 +1,12 @@
 %{
+
 #include "output.hpp"
 #include "iostream"
+extern int yylineno;
+int yylex();
+void yyerror(char const* s);
 using namespace output;
+
 %}
 
 %nonassoc VOID
@@ -50,7 +55,7 @@ Statement : LBRACE Statements RBRACE {printProductionRule(4);}
           | Type ID ASSIGN Exp SC {printProductionRule(6);}
           | ID ASSIGN Exp SC {printProductionRule(7);}
           | Call SC {printProductionRule(8);}
-          | Return SC {printProductionRule(9);}
+          | RETURN SC {printProductionRule(9);}
           | IF LPAREN Exp RPAREN Statement {printProductionRule(10);}
           | IF LPAREN Exp RPAREN Statement ELSE Statement {printProductionRule(11);}
           | WHILE LPAREN Exp RPAREN Statement {printProductionRule(12);}
@@ -80,3 +85,13 @@ Exp: LPAREN Exp RPAREN {printProductionRule(19);}
     | Exp LP_RELOP Exp {printProductionRule(31);}
     | LPAREN Type RPAREN Exp {printProductionRule(32);}
 
+%%
+void yyerror(char const* s){
+    errorSyn(yylineno);
+    exit(0);
+}
+
+
+int main(){
+    return yyparse();
+}
